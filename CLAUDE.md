@@ -30,11 +30,38 @@ python -m trazas list            # smoke test
 - Never commit secrets, tokens or real log data. Never weaken workflow `permissions`.
 - Conventional Commits. Work on a branch and open a PR; don't push to `main` directly.
 
-## Pending work (maintainer TODO)
+## Repo & workflow gotchas
 
-1. ~~Replace `OWNER` placeholder~~ — done.
-2. ~~Pin GitHub Actions to SHAs~~ — done (Dependabot keeps them updated).
-3. ~~`pre-commit autoupdate`~~ — done.
-4. `docs/github-setup.md`: applied, including SSH commit signing and the PyPI pending
-   trusted publisher.
-5. ~~LSASS credential dumping scenario (T1003.001)~~ — done (`lsass-dump`).
+- Repo: `geinerjimenezvillegas-create/trazas` (public). PyPI: `trazas`.
+- `main` ruleset: PR required (0 approvals, squash only), 9 required checks (lint, 6 test
+  jobs, build, `Analyze (python)`), no force-push/deletion, **signed commits required**.
+- **Every commit in a PR must be signed**, even though merges are squashed; one unsigned
+  commit blocks the merge. If a branch has unsigned commits, re-sign them
+  (`git rebase --force-rebase --gpg-sign main`) onto a *new* branch and open a new PR.
+  Don't force-push and never use `gh pr merge --admin`.
+- Actions are pinned to full SHAs with a `# vX.Y.Z` comment. Dependabot opens weekly
+  grouped PRs; check that each SHA matches its tag (`gh api repos/<a>/commits/<tag>`).
+- Changing `noise.py` (thresholds, new event kinds) changes the output for every seed.
+  Note it in the CHANGELOG and **re-verify the numbers quoted in README.md, README.es.md and
+  `docs/testing-detections.md`** (LSASS demo: seed 1, noise 2000 ⇒ naive rule 1 TP / 89 FP,
+  CallTrace rule 1 TP / 0 FP; seeds 1/5/7 = comsvcs/Mimikatz/procdump).
+
+## Releasing
+
+1. Bump `__version__` in `src/trazas/__init__.py`; move `[Unreleased]` into a dated
+   section in `CHANGELOG.md` and update the compare links. Merge through a PR.
+2. On updated `main`: `git tag -s vX.Y.Z -m "trazas vX.Y.Z"` then `git push origin vX.Y.Z`.
+3. `release.yml` builds, attests and waits at the `pypi` environment; the maintainer
+   approves it in Actions. Afterwards it publishes to PyPI and creates the GitHub release.
+4. Verify: `pip install trazas==X.Y.Z` in a clean venv and
+   `gh attestation verify <wheel> --repo geinerjimenezvillegas-create/trazas`.
+
+## Status (2026-11-11)
+
+- Initial setup from the original TODO is done: placeholders, SHA pins, pre-commit
+  update, `docs/github-setup.md` checklist (fully applied), `lsass-dump` scenario.
+- **v0.1.0 released** to PyPI and GitHub Releases (5 scenarios). PyPI shows the 0.1.0
+  README, without the LSASS demo added later.
+- Open `good first issue`s for new scenarios: #10 Kerberoasting (T1558.003), #11 DCSync
+  (T1003.006), #12 scheduled task (T1053.005), #13 log clearing (T1070.001). Each issue
+  describes the events and look-alikes; review contributions against it.
