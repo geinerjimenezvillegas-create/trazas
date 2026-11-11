@@ -50,6 +50,5 @@ the public repo.
 
 ## Hardening later
 
-- [ ] Pin every action to a full commit SHA (Dependabot keeps them updated). Tools
-      such as `pinact` or StepSecurity's secure-workflow do it automatically.
+- [x] Pin every action to a full commit SHA (Dependabot keeps them updated).
 - [x] Replace the `OWNER` placeholder across the repo with your username.
