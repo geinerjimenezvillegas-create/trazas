@@ -5,7 +5,7 @@ the public repo.
 
 ## Account
 
-- [ ] 2FA enabled (passkey or authenticator app) on your GitHub account.
+- [x] 2FA enabled (passkey or authenticator app) on your GitHub account.
 - [x] Commit signing set up (SSH or GPG key marked as *signing key*).
 
 ## Settings → General

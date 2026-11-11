@@ -36,5 +36,5 @@ python -m trazas list            # smoke test
 2. ~~Pin GitHub Actions to SHAs~~ — done (Dependabot keeps them updated).
 3. ~~`pre-commit autoupdate`~~ — done.
 4. `docs/github-setup.md`: applied, including SSH commit signing and the PyPI pending
-   trusted publisher. Still open: confirm account 2FA.
+   trusted publisher.
 5. ~~LSASS credential dumping scenario (T1003.001)~~ — done (`lsass-dump`).
