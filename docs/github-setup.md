@@ -43,7 +43,7 @@ the public repo.
 ## PyPI (before the first release)
 
 - [ ] Create a PyPI account with 2FA.
-- [ ] Add a *pending trusted publisher*: project `trazas`, owner `OWNER`, repo `trazas`,
+- [ ] Add a *pending trusted publisher*: project `trazas`, owner `geinerjimenezvillegas-create`, repo `trazas`,
       workflow `release.yml`, environment `pypi`.
 - [ ] Release: bump `__version__`, update `CHANGELOG.md`, then
       `git tag -s v0.1.0 && git push --tags`.
@@ -52,5 +52,4 @@ the public repo.
 
 - [ ] Pin every action to a full commit SHA (Dependabot keeps them updated). Tools
       such as `pinact` or StepSecurity's secure-workflow do it automatically.
-- [ ] Replace `OWNER` across the repo with your username:
-      `grep -rl OWNER . | xargs sed -i 's/OWNER/<your-user>/g'`
+- [x] Replace the `OWNER` placeholder across the repo with your username.

@@ -32,9 +32,9 @@ dev = ["pytest>=8", "pytest-cov>=5", "mypy>=1.11", "ruff>=0.6", "pre-commit>=3.8
 trazas = "trazas.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/OWNER/trazas"
-Issues = "https://github.com/OWNER/trazas/issues"
-Changelog = "https://github.com/OWNER/trazas/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/geinerjimenezvillegas-create/trazas"
+Issues = "https://github.com/geinerjimenezvillegas-create/trazas/issues"
+Changelog = "https://github.com/geinerjimenezvillegas-create/trazas/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "src/trazas/__init__.py"
