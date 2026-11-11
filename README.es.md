@@ -15,6 +15,34 @@ $ pip install trazas
 $ trazas generate windows-bruteforce psexec-lateral --seed 42 --labels -o dataset.jsonl
 ```
 
+## Por qué importan los eventos parecidos
+
+Una primera regla típica para volcado de credenciales de LSASS marca las máscaras de
+acceso sospechosas:
+
+```kql
+SecurityEvent
+| where EventID == 10 and TargetImage endswith "lsass.exe"
+| where GrantedAccess in ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")
+```
+
+Corrida sobre `trazas generate lsass-dump --seed 1 --start 2026-01-01T00:00:00Z --noise 2000 --labels`
+detecta el ataque, **más 89 falsos positivos**: Defender pide `0x1010` (la misma máscara
+que Mimikatz) y el sensor del EDR pide `0x1fffff`. Si en cambio se mira el `CallTrace`:
+
+```kql
+SecurityEvent
+| where EventID == 10 and TargetImage endswith "lsass.exe"
+| where GrantedAccess in ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")
+// Mirar CÓMO se abrió lsass, no solo la máscara de acceso:
+| where CallTrace has_any ("dbgcore.dll", "dbghelp.dll", "comsvcs.dll")  // APIs de minidump
+     or CallTrace contains "UNKNOWN("                                     // código ejecutándose desde memoria
+```
+
+→ **1 verdadero positivo, 0 falsos positivos**, con las tres variantes de volcado (las
+semillas 1, 5 y 7 dan comsvcs, Mimikatz y procdump). Paso a paso en
+[docs/testing-detections.md](docs/testing-detections.md#example-lsass-dumping-and-look-alikes).
+
 ## Características
 
 - **Esquemas listos para detección**: los eventos de Windows usan los nombres de columna
@@ -23,7 +51,7 @@ $ trazas generate windows-bruteforce psexec-lateral --seed 42 --labels -o datase
   pruebas de regresión de tus reglas en CI.
 - **Verdad base**: `--labels` agrega `_trazas.malicious` y `_trazas.technique` a cada registro.
 - **Ruido realista**: inicios de sesión normales, uso de recursos compartidos, errores de
-  contraseña honestos.
+  contraseña honestos y software de seguridad accediendo a `lsass.exe`.
 - **Seguro por diseño**: las IP externas salen solo de rangos de documentación (RFC 5737),
   las internas de RFC 1918 y los dominios de `example.com`. Cero dependencias en tiempo de
   ejecución.
