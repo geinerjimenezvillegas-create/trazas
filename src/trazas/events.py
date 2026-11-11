@@ -32,14 +32,19 @@ class Event:
     malicious: bool = False
     technique: str | None = None
     raw: str | None = field(default=None, compare=False)
+    # Fields removed or truncated to simulate incomplete telemetry (see trazas.degrade).
+    degraded: tuple[str, ...] = ()
 
     def to_record(self, *, include_labels: bool = False) -> dict[str, Any]:
         record: dict[str, Any] = {"TimeGenerated": iso_utc(self.timestamp), "Source": self.source}
         record.update(self.fields)
         if include_labels:
-            record["_trazas"] = {
+            labels: dict[str, Any] = {
                 "scenario": self.scenario,
                 "malicious": self.malicious,
                 "technique": self.technique,
             }
+            if self.degraded:  # only present when degradation was requested
+                labels["degraded"] = list(self.degraded)
+            record["_trazas"] = labels
         return record
