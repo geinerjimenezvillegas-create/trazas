@@ -37,4 +37,4 @@ python -m trazas list            # smoke test
 3. ~~`pre-commit autoupdate`~~ — done.
 4. `docs/github-setup.md`: applied, including SSH commit signing and the PyPI pending
    trusted publisher. Still open: confirm account 2FA.
-5. Next scenario: LSASS credential dumping (T1003.001) — Sysmon 10 ProcessAccess on lsass.exe, plus benign look-alikes (AV/EDR).
+5. ~~LSASS credential dumping scenario (T1003.001)~~ — done (`lsass-dump`).
