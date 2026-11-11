@@ -6,7 +6,7 @@ the public repo.
 ## Account
 
 - [ ] 2FA enabled (passkey or authenticator app) on your GitHub account.
-- [ ] Commit signing set up (SSH or GPG key marked as *signing key*).
+- [x] Commit signing set up (SSH or GPG key marked as *signing key*).
 
 ## Settings → General
 
@@ -42,8 +42,8 @@ the public repo.
 
 ## PyPI (before the first release)
 
-- [ ] Create a PyPI account with 2FA.
-- [ ] Add a *pending trusted publisher*: project `trazas`, owner `geinerjimenezvillegas-create`, repo `trazas`,
+- [x] Create a PyPI account with 2FA.
+- [x] Add a *pending trusted publisher*: project `trazas`, owner `geinerjimenezvillegas-create`, repo `trazas`,
       workflow `release.yml`, environment `pypi`.
 - [ ] Release: bump `__version__`, update `CHANGELOG.md`, then
       `git tag -s v0.1.0 && git push --tags`.
