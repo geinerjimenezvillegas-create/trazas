@@ -32,8 +32,10 @@ python -m trazas list            # smoke test
 
 ## Pending work (maintainer TODO)
 
-1. Replace `OWNER` placeholder with the real GitHub username across the repo.
-2. Pin every GitHub Action in `.github/workflows/` to a full commit SHA, with the version as a trailing comment (look up real SHAs with `gh api`, never invent them).
-3. Run `pre-commit autoupdate` and commit the result.
-4. Help apply the checklist in `docs/github-setup.md` (rulesets, security settings, PyPI trusted publisher) using `gh` where possible.
+1. ~~Replace `OWNER` placeholder~~ — done.
+2. ~~Pin GitHub Actions to SHAs~~ — done (Dependabot keeps them updated).
+3. ~~`pre-commit autoupdate`~~ — done.
+4. `docs/github-setup.md`: everything scriptable is applied. Still manual: account 2FA,
+   commit signing (then add *Require signed commits* to the `main` ruleset), PyPI account
+   and pending trusted publisher.
 5. Next scenario: LSASS credential dumping (T1003.001) — Sysmon 10 ProcessAccess on lsass.exe, plus benign look-alikes (AV/EDR).
