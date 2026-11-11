@@ -45,7 +45,7 @@ the public repo.
 - [x] Create a PyPI account with 2FA.
 - [x] Add a *pending trusted publisher*: project `trazas`, owner `geinerjimenezvillegas-create`, repo `trazas`,
       workflow `release.yml`, environment `pypi`.
-- [ ] Release: bump `__version__`, update `CHANGELOG.md`, then
+- [x] Release: bump `__version__`, update `CHANGELOG.md`, then
       `git tag -s v0.1.0 && git push --tags`.
 
 ## Hardening later
