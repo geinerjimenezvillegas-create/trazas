@@ -1,8 +1,8 @@
 # trazas
 
-[![CI](https://github.com/OWNER/trazas/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/trazas/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/OWNER/trazas/actions/workflows/codeql.yml/badge.svg)](https://github.com/OWNER/trazas/actions/workflows/codeql.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/OWNER/trazas/badge)](https://scorecard.dev/viewer/?uri=github.com/OWNER/trazas)
+[![CI](https://github.com/geinerjimenezvillegas-create/trazas/actions/workflows/ci.yml/badge.svg)](https://github.com/geinerjimenezvillegas-create/trazas/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/geinerjimenezvillegas-create/trazas/actions/workflows/codeql.yml/badge.svg)](https://github.com/geinerjimenezvillegas-create/trazas/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/geinerjimenezvillegas-create/trazas/badge)](https://scorecard.dev/viewer/?uri=github.com/geinerjimenezvillegas-create/trazas)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Realistic, labelled attack logs for testing detection rules — no lab required.**
