@@ -1,0 +1,30 @@
+name: New scenario
+description: Propose an attack scenario to simulate
+labels: [scenario]
+body:
+  - type: input
+    id: techniques
+    attributes:
+      label: MITRE ATT&CK technique(s)
+      placeholder: T1003.001
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options: [windows, linux, cloud, other]
+    validations:
+      required: true
+  - type: textarea
+    id: events
+    attributes:
+      label: Which events/log lines should appear, in what order?
+      description: Event IDs, key fields and timing. Link public references (vendor docs, DFIR reports).
+    validations:
+      required: true
+  - type: textarea
+    id: lookalikes
+    attributes:
+      label: Benign look-alikes
+      description: Legitimate activity that produces similar logs (useful as noise / false positives).

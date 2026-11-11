@@ -1,0 +1,28 @@
+name: Bug report
+description: Something produces wrong, invalid or unrealistic output
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Security issue?** Do not open a public issue — see SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: trazas version
+      description: Output of `trazas --version`
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Exact command (include --seed and --start so we can reproduce it)
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect, and what happened instead?
+    validations:
+      required: true
