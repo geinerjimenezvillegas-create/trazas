@@ -35,6 +35,7 @@ $ trazas generate windows-bruteforce psexec-lateral --seed 42 --labels -o datase
 | `windows-bruteforce` | Windows | T1110.001 | Ráfaga de 4625 contra una cuenta desde una IP externa, luego 4624 |
 | `windows-spray` | Windows | T1110.003 | Una contraseña contra muchas cuentas, lento, con un acierto |
 | `psexec-lateral` | Windows | T1021.002, T1569.002 | 4624 tipo 3 → 5140 `ADMIN$` → 7045 `PSEXESVC` → Sysmon 1 como SYSTEM |
+| `lsass-dump` | Windows | T1003.001 | Sysmon 1 del volcador (comsvcs `MiniDump`, `procdump -ma` o Mimikatz renombrado) → Sysmon 10 sobre `lsass.exe` → Sysmon 11 `.dmp`; el ruido añade accesos benignos de Defender/EDR a lsass |
 | `ssh-bruteforce` | Linux | T1110.001 | Fallos de sshd con usuarios comunes y luego `Accepted password` |
 
 ## Probar una regla KQL sin Sentinel

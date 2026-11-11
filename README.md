@@ -41,6 +41,7 @@ trazas: 248 events, seed=42, start=2026-11-10T23:00:00+00:00
 | `windows-bruteforce` | Windows | T1110.001 | Burst of 4625 against one account from one external IP, then 4624 |
 | `windows-spray` | Windows | T1110.003 | One password against many accounts (real and invalid), slow, one success |
 | `psexec-lateral` | Windows | T1021.002, T1569.002 | 4624 type 3 → 5140 `ADMIN$` → 7045 `PSEXESVC` → Sysmon 1 recon as SYSTEM |
+| `lsass-dump` | Windows | T1003.001 | Sysmon 1 dumper (comsvcs `MiniDump`, `procdump -ma` or renamed Mimikatz) → Sysmon 10 on `lsass.exe` → Sysmon 11 `.dmp`; noise adds benign Defender/EDR lsass access |
 | `ssh-bruteforce` | Linux | T1110.001 | sshd failures with common usernames, then `Accepted password` |
 
 Run `trazas list` and `trazas describe <id>` for details.
