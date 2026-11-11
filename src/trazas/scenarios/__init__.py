@@ -7,6 +7,7 @@ running ``trazas`` never imports code from outside the package.
 from __future__ import annotations
 
 from trazas.scenarios.base import Platform, Scenario
+from trazas.scenarios.lsass_dump import LsassCredentialDump
 from trazas.scenarios.psexec_lateral import PsExecLateralMovement
 from trazas.scenarios.ssh_bruteforce import SshBruteForce
 from trazas.scenarios.windows_bruteforce import WindowsBruteForce
@@ -16,6 +17,7 @@ _ALL: tuple[type[Scenario], ...] = (
     WindowsBruteForce,
     WindowsPasswordSpray,
     PsExecLateralMovement,
+    LsassCredentialDump,
     SshBruteForce,
 )
 

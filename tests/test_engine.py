@@ -81,6 +81,42 @@ def test_psexec_chain(start: datetime) -> None:
     assert any(e.fields.get("ServiceName") == "PSEXESVC" for e in events)
 
 
+def test_lsass_dump_chain(start: datetime) -> None:
+    seen_images: set[str] = set()
+    for seed in range(30):
+        events = engine.generate(["lsass-dump"], seed=seed, start=start, noise=0)
+        proc, access, *rest = events
+        assert proc.fields["EventID"] == 1
+        assert access.fields["EventID"] == 10
+        assert access.fields["TargetImage"].lower().endswith("\\lsass.exe")
+        assert access.fields["SourceImage"] == proc.fields["Image"]
+        assert access.fields["SourceProcessId"] == proc.fields["ProcessId"]
+        assert access.fields["GrantedAccess"] in {"0x1fffff", "0x1010"}
+        if rest:  # dump variants write the minidump to disk
+            (dump,) = rest
+            assert dump.fields["EventID"] == 11
+            assert dump.fields["TargetFilename"].endswith(".dmp")
+            assert dump.fields["TargetFilename"] in proc.fields["CommandLine"]
+        else:  # in-memory variant leaves an UNKNOWN frame instead of a file
+            assert "UNKNOWN(" in access.fields["CallTrace"]
+        assert all(e.malicious and e.technique == "T1003.001" for e in events)
+        seen_images.add(proc.fields["Image"])
+    assert len(seen_images) == 3, "every dumping variant should appear across seeds"
+
+
+def test_windows_noise_has_benign_lsass_lookalikes(start: datetime) -> None:
+    events = engine.generate(["windows-bruteforce"], seed=1, start=start, noise=1000)
+    lookalikes = [e for e in events if e.fields.get("TargetImage", "").endswith("lsass.exe")]
+    assert lookalikes
+    assert not any(e.malicious for e in lookalikes)
+    # Defender requests the same mask as Mimikatz; rules must not rely on it alone.
+    assert {e.fields["GrantedAccess"] for e in lookalikes} >= {"0x1010", "0x1fffff"}
+    pids_by_host: dict[str, set[int]] = {}
+    for e in lookalikes:
+        pids_by_host.setdefault(e.fields["Computer"], set()).add(e.fields["TargetProcessId"])
+    assert all(len(pids) == 1 for pids in pids_by_host.values()), "lsass PID must be stable per host"
+
+
 def test_duplicate_scenarios_are_deduplicated(start: datetime) -> None:
     once = engine.generate(["ssh-bruteforce"], seed=1, start=start)
     twice = engine.generate(["ssh-bruteforce", "ssh-bruteforce"], seed=1, start=start)

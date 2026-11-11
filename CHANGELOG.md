@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Scenario `lsass-dump` (T1003.001): Sysmon 1 → Sysmon 10 ProcessAccess on `lsass.exe`
+  → Sysmon 11 dump file, in three variants (comsvcs.dll `MiniDump`, `procdump -ma`,
+  renamed Mimikatz with an `UNKNOWN` CallTrace frame).
+- Windows noise now includes benign Sysmon 10 lsass access from Defender (`0x1010`),
+  the EDR sensor (`0x1fffff`) and svchost (`0x1000`) as look-alikes.
+
+### Changed
+
+- Windows noise for a given seed differs from 0.1.0 because of the new look-alike events.
+
 ## [0.1.0] - 2026-11-10
 
 ### Added

@@ -13,6 +13,12 @@ STATUS_LOGON_FAILURE = "0xc000006d"
 SUB_BAD_PASSWORD = "0xc000006a"  # noqa: S105 - NTSTATUS code, not a secret
 SUB_NO_SUCH_USER = "0xc0000064"
 
+SYSMON_CHANNEL = "Microsoft-Windows-Sysmon/Operational"
+LSASS_IMAGE = "C:\\Windows\\system32\\lsass.exe"
+# Frames found at the bottom of almost every Sysmon CallTrace.
+NTDLL = "C:\\Windows\\SYSTEM32\\ntdll.dll"
+KERNELBASE = "C:\\Windows\\System32\\KERNELBASE.dll"
+
 _ACTIVITY = {
     4624: "4624 - An account was successfully logged on.",
     4625: "4625 - An account failed to log on.",
@@ -162,17 +168,89 @@ def sysmon_process(
     scenario: str,
     malicious: bool = False,
     technique: str | None = None,
+    pid: int | None = None,
 ) -> Event:
     fields: dict[str, Any] = {
         "Computer": computer,
         "EventID": 1,
-        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "Channel": SYSMON_CHANNEL,
         "Image": image,
         "CommandLine": command_line,
         "ParentImage": parent_image,
-        "ProcessId": ctx.pid(),
+        "ProcessId": ctx.pid() if pid is None else pid,
         "ParentProcessId": ctx.pid(),
         "User": user,
         "IntegrityLevel": "System" if user == "NT AUTHORITY\\SYSTEM" else "High",
+    }
+    return Event(ts, "sysmon", fields, scenario, malicious, technique)
+
+
+def call_trace(ctx: GenContext, modules: tuple[str, ...], *, unknown_frame: bool = False) -> str:
+    """Build a Sysmon ``CallTrace`` string (``module+offset|...``) with random offsets.
+
+    ``unknown_frame`` appends an ``UNKNOWN(address)`` frame, typical of code running
+    from memory that is not backed by a module on disk.
+    """
+    frames = [f"{module}+{ctx.rng.randint(0x1000, 0xFFFFF):x}" for module in modules]
+    if unknown_frame:
+        frames.append(f"UNKNOWN({0x7FF000000000 + ctx.rng.getrandbits(32):016X})")
+    return "|".join(frames)
+
+
+def sysmon_process_access(
+    ctx: GenContext,
+    ts: datetime,
+    *,
+    computer: str,
+    source_image: str,
+    source_pid: int,
+    source_user: str,
+    target_image: str,
+    target_pid: int,
+    granted_access: str,
+    trace: str,
+    scenario: str,
+    malicious: bool = False,
+    technique: str | None = None,
+) -> Event:
+    """Sysmon event 10 (ProcessAccess): one process opened a handle to another."""
+    fields: dict[str, Any] = {
+        "Computer": computer,
+        "EventID": 10,
+        "Channel": SYSMON_CHANNEL,
+        "SourceImage": source_image,
+        "SourceProcessId": source_pid,
+        "SourceThreadId": ctx.rng.randint(1000, 30000),
+        "SourceUser": source_user,
+        "TargetImage": target_image,
+        "TargetProcessId": target_pid,
+        "TargetUser": "NT AUTHORITY\\SYSTEM",
+        "GrantedAccess": granted_access,
+        "CallTrace": trace,
+    }
+    return Event(ts, "sysmon", fields, scenario, malicious, technique)
+
+
+def sysmon_file_create(
+    ts: datetime,
+    *,
+    computer: str,
+    image: str,
+    pid: int,
+    user: str,
+    target_filename: str,
+    scenario: str,
+    malicious: bool = False,
+    technique: str | None = None,
+) -> Event:
+    """Sysmon event 11 (FileCreate)."""
+    fields: dict[str, Any] = {
+        "Computer": computer,
+        "EventID": 11,
+        "Channel": SYSMON_CHANNEL,
+        "Image": image,
+        "ProcessId": pid,
+        "User": user,
+        "TargetFilename": target_filename,
     }
     return Event(ts, "sysmon", fields, scenario, malicious, technique)
