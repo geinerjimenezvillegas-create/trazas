@@ -20,7 +20,7 @@ the public repo.
       0 while solo, but still go through PRs so CI runs).
 - [x] Require status checks: `Lint & type-check`, the `Test (...)` jobs,
       `Build & smoke-test package`, `Analyze (python)`.
-- [ ] Require signed commits (pending: set up a signing key first, then add the rule).
+- [x] Require signed commits.
 
 ## Settings → Code security
 
