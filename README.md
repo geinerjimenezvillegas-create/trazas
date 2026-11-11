@@ -21,6 +21,34 @@ $ trazas generate windows-bruteforce psexec-lateral --seed 42 --labels -o datase
 trazas: 248 events, seed=42, start=2026-11-10T23:00:00+00:00
 ```
 
+## Why look-alikes matter
+
+A typical first rule for LSASS credential dumping flags suspicious access masks:
+
+```kql
+SecurityEvent
+| where EventID == 10 and TargetImage endswith "lsass.exe"
+| where GrantedAccess in ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")
+```
+
+Run it on `trazas generate lsass-dump --seed 1 --start 2026-01-01T00:00:00Z --noise 2000 --labels`
+and it catches the attack, **plus 89 false positives**: Defender asks for `0x1010`
+(the same mask as Mimikatz) and the EDR sensor asks for `0x1fffff`. Looking at the
+`CallTrace` instead:
+
+```kql
+SecurityEvent
+| where EventID == 10 and TargetImage endswith "lsass.exe"
+| where GrantedAccess in ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")
+// Look at HOW lsass was opened, not only the access mask:
+| where CallTrace has_any ("dbgcore.dll", "dbghelp.dll", "comsvcs.dll")  // minidump APIs
+     or CallTrace contains "UNKNOWN("                                     // code running from memory
+```
+
+→ **1 true positive, 0 false positives**, across all three dumping variants (seeds 1, 5
+and 7 give comsvcs, Mimikatz and procdump). Walkthrough in
+[docs/testing-detections.md](docs/testing-detections.md#example-lsass-dumping-and-look-alikes).
+
 ## Features
 
 - **Detection-ready schemas** — Windows events use Microsoft Sentinel `SecurityEvent`
@@ -30,7 +58,8 @@ trazas: 248 events, seed=42, start=2026-11-10T23:00:00+00:00
   regression tests of your rules in CI.
 - **Ground truth** — `--labels` adds `_trazas.malicious` and `_trazas.technique` to every
   record.
-- **Realistic noise** — normal logons, admin share use, honest password typos.
+- **Realistic noise** — normal logons, admin share use, honest password typos, and
+  security software touching `lsass.exe`.
 - **Safe by design** — external IPs come only from RFC 5737 documentation ranges,
   internal ones from RFC 1918, domains from `example.com`. Zero runtime dependencies.
 
