@@ -6,7 +6,7 @@ Thanks for helping! Contributions in English or Spanish are welcome. /
 ## Development setup
 
 ```console
-git clone https://github.com/OWNER/trazas && cd trazas
+git clone https://github.com/geinerjimenezvillegas-create/trazas && cd trazas
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 pre-commit install

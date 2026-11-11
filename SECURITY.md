@@ -9,7 +9,7 @@ Only the latest released version receives fixes while the project is pre-1.0.
 **Please do not open public issues for security problems.**
 
 Use GitHub's private reporting: **Security → Report a vulnerability** on this
-repository (<https://github.com/OWNER/trazas/security/advisories/new>).
+repository (<https://github.com/geinerjimenezvillegas-create/trazas/security/advisories/new>).
 
 Include the version, the exact command, and the impact you see. You can expect an
 acknowledgement within 7 days and a fix or mitigation plan within 30 days for
@@ -32,7 +32,7 @@ the network, or read system logs. Relevant reports include, for example:
   (OIDC, no stored tokens), with signed build provenance. Verify a download with:
 
   ```console
-  gh attestation verify trazas-*.whl --repo OWNER/trazas
+  gh attestation verify trazas-*.whl --repo geinerjimenezvillegas-create/trazas
   ```
 
 - CodeQL, OpenSSF Scorecard, Dependabot and secret scanning run on the repository.
