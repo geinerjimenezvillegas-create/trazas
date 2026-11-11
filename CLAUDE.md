@@ -35,7 +35,7 @@ python -m trazas list            # smoke test
 1. ~~Replace `OWNER` placeholder~~ — done.
 2. ~~Pin GitHub Actions to SHAs~~ — done (Dependabot keeps them updated).
 3. ~~`pre-commit autoupdate`~~ — done.
-4. `docs/github-setup.md`: everything scriptable is applied. Still manual: account 2FA,
-   commit signing (then add *Require signed commits* to the `main` ruleset), PyPI account
-   and pending trusted publisher.
+4. `docs/github-setup.md`: applied, including SSH commit signing and the PyPI pending
+   trusted publisher. Still open: confirm account 2FA; add *Require signed commits* to the
+   `main` ruleset.
 5. Next scenario: LSASS credential dumping (T1003.001) — Sysmon 10 ProcessAccess on lsass.exe, plus benign look-alikes (AV/EDR).
