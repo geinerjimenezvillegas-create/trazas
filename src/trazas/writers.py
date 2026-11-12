@@ -29,3 +29,12 @@ def write(events: Iterable[Event], out: TextIO, fmt: Format, *, labels: bool = F
         out.write(line + "\n")
         n += 1
     return n
+
+
+def write_labels(events: Iterable[Event], out: TextIO) -> int:
+    """Write one ground-truth record per event, keyed by ``TrazasEventId``."""
+    n = 0
+    for event in events:
+        out.write(json.dumps(event.label_record(), ensure_ascii=False) + "\n")
+        n += 1
+    return n

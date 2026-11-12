@@ -14,8 +14,16 @@ Pin `--seed` and `--start` so the same dataset can be regenerated in CI.
 
 ## 2. Load it into Azure Data Explorer (free, KQL)
 
-In the ADX web UI: **Get data → Local file → events.jsonl**, new table `SecurityEvent`,
-format JSON. ADX infers the columns; `_trazas` becomes a `dynamic` column.
+**Create the tables first.** Run `trazas schema`, then paste its output into the ADX query
+editor and run each command on its own (put the cursor inside it and press Shift+Enter).
+The commands use `.create-merge`, so running them again is harmless.
+
+Why: if you let the ingestion wizard create the table, ADX infers columns from the first
+rows of the file. Columns that only appear in rarer events (Sysmon's `CallTrace`, for
+example) can be left out, and rules then fail with *"Failed to resolve ... 'CallTrace'"*.
+
+Then in the ADX web UI: **Get data → Local file → events.jsonl**, choose the **existing**
+table `SecurityEvent`, format JSON.
 
 ## 3. Run the rule and score it
 
@@ -35,6 +43,41 @@ SecurityEvent
 - `Flagged=true, Malicious=true` → true positives
 - `Flagged=true, Malicious=false` → false positives
 - `Flagged=false, Malicious=true` → missed attacks
+
+### Blind testing with a separate labels file
+
+With `--labels` the answers sit next to the data, which makes it tempting to peek. To
+test a rule blind, keep the ground truth in another file:
+
+```console
+trazas generate lsass-dump --seed 1 --start 2026-01-01T00:00:00Z --noise 2000 \
+  -o events.jsonl --labels-file truth.jsonl
+```
+
+Ingest `events.jsonl` into `SecurityEvent` and `truth.jsonl` into `TrazasLabels` (both
+created by `trazas schema`). Write the rule against `SecurityEvent` only, then score it by
+joining on `TrazasEventId`:
+
+```kql
+let flagged =
+    SecurityEvent
+    | where EventID == 10 and TargetImage endswith "lsass.exe"
+    | where GrantedAccess in ("0x1010", "0x1410", "0x1438", "0x143a", "0x1fffff")
+    | project TrazasEventId;
+TrazasLabels
+| extend Flagged = TrazasEventId in (flagged)
+| where Flagged or malicious
+| summarize count() by Flagged, malicious
+```
+
+| Flagged | malicious | count |
+|---|---|---|
+| true | true | 1 |
+| true | false | 89 |
+| false | true | 2 |
+
+The last row is the Sysmon 1 and 11 events of the attack: this rule only looks at
+event 10, so it "misses" them by design. Scoring by event id makes that visible.
 
 Notice that this rule catches `windows-bruteforce` but misses
 `windows-spray` entirely, which is low-and-slow by design — exactly the kind of gap this tool is

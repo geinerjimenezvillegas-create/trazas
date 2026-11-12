@@ -34,17 +34,32 @@ class Event:
     raw: str | None = field(default=None, compare=False)
     # Fields removed or truncated to simulate incomplete telemetry (see trazas.degrade).
     degraded: tuple[str, ...] = ()
+    # 1-based position in the generated dataset, assigned by the engine. It lets results
+    # of a rule be joined with ground truth kept in a separate file (``--labels-file``).
+    event_id: int = 0
+
+    def labels(self) -> dict[str, Any]:
+        """Ground truth for this event."""
+        labels: dict[str, Any] = {
+            "scenario": self.scenario,
+            "malicious": self.malicious,
+            "technique": self.technique,
+        }
+        if self.degraded:  # only present when degradation was requested
+            labels["degraded"] = list(self.degraded)
+        return labels
 
     def to_record(self, *, include_labels: bool = False) -> dict[str, Any]:
-        record: dict[str, Any] = {"TimeGenerated": iso_utc(self.timestamp), "Source": self.source}
+        record: dict[str, Any] = {
+            "TimeGenerated": iso_utc(self.timestamp),
+            "Source": self.source,
+            "TrazasEventId": self.event_id,
+        }
         record.update(self.fields)
         if include_labels:
-            labels: dict[str, Any] = {
-                "scenario": self.scenario,
-                "malicious": self.malicious,
-                "technique": self.technique,
-            }
-            if self.degraded:  # only present when degradation was requested
-                labels["degraded"] = list(self.degraded)
-            record["_trazas"] = labels
+            record["_trazas"] = self.labels()
         return record
+
+    def label_record(self) -> dict[str, Any]:
+        """One line of a ``--labels-file``: the event id plus its ground truth."""
+        return {"TrazasEventId": self.event_id, **self.labels()}

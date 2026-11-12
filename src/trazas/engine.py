@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 from datetime import datetime
 
 from trazas import degrade as degradation
@@ -49,4 +50,5 @@ def generate(
     # Stable sort: ties keep generation order, so output stays deterministic.
     events.sort(key=lambda e: e.timestamp)
     # Last, so the RNG draws for generation are the same with or without degradation.
-    return degradation.apply(events, degrade, ctx)
+    events = degradation.apply(events, degrade, ctx)
+    return [replace(e, event_id=i) for i, e in enumerate(events, start=1)]

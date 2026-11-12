@@ -49,7 +49,8 @@ semillas 1, 5 y 7 dan comsvcs, Mimikatz y procdump). Paso a paso en
   de `SecurityEvent` de Microsoft Sentinel; los de Linux son líneas reales de `auth.log`.
 - **Reproducible**: misma `--seed` + `--start` ⇒ salida idéntica byte a byte. Ideal para
   pruebas de regresión de tus reglas en CI.
-- **Verdad base**: `--labels` agrega `_trazas.malicious` y `_trazas.technique` a cada registro.
+- **Verdad base**: `--labels` agrega `_trazas.malicious` y `_trazas.technique` a cada registro,
+  o `--labels-file` la guarda en un archivo aparte para probar reglas a ciegas.
 - **Ruido realista**: inicios de sesión normales, uso de recursos compartidos, errores de
   contraseña honestos y software de seguridad accediendo a `lsass.exe`.
 - **Huecos de telemetría**: `--drop-field` / `--truncate-field` quitan o recortan campos en una
@@ -71,9 +72,15 @@ semillas 1, 5 y 7 dan comsvcs, Mimikatz y procdump). Paso a paso en
 ## Probar una regla KQL sin Sentinel
 
 1. Creá un [clúster gratuito de Azure Data Explorer](https://dataexplorer.azure.com/freecluster).
-2. Generá datos: `trazas generate windows-bruteforce windows-spray -s 1 --labels -o events.jsonl`
-3. Ingerí `events.jsonl` en una tabla llamada `SecurityEvent` (formato JSON).
-4. Corré tu regla y compará con `_trazas.malicious`.
+2. Corré `trazas schema` y ejecutá en el editor de consultas de ADX los comandos que imprime.
+   Así se crean las tablas con todas las columnas desde el principio. Si no, ADX deduce las
+   columnas de las primeras filas y puede dejar fuera algunas menos frecuentes, como `CallTrace`
+   de Sysmon.
+3. Generá datos: `trazas generate windows-bruteforce windows-spray -s 1 --labels -o events.jsonl`
+4. Ingerí `events.jsonl` en la tabla existente `SecurityEvent` (formato JSON).
+5. Corré tu regla y compará con `_trazas.malicious`. Para probar a ciegas, usá
+   `--labels-file etiquetas.jsonl` en vez de `--labels`: la verdad base queda en otro archivo
+   y se cruza por `TrazasEventId`.
 
 Guía completa: [docs/testing-detections.md](docs/testing-detections.md).
 
