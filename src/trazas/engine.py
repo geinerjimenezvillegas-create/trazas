@@ -5,8 +5,10 @@ from __future__ import annotations
 from collections.abc import Sequence
 from datetime import datetime
 
+from trazas import degrade as degradation
 from trazas import scenarios
 from trazas.context import GenContext
+from trazas.degrade import FieldDegradation
 from trazas.events import Event
 from trazas.noise import noise_for
 
@@ -21,10 +23,12 @@ def generate(
     start: datetime,
     noise: int = 200,
     window_s: float = DEFAULT_WINDOW_S,
+    degrade: Sequence[FieldDegradation] = (),
 ) -> list[Event]:
     """Generate a sorted list of events for the given scenarios.
 
-    ``noise`` is the number of benign events per platform involved.
+    ``noise`` is the number of benign events per platform involved. ``degrade``
+    drops or truncates fields afterwards to simulate incomplete telemetry.
     """
     if not scenario_ids:
         raise ValueError("at least one scenario is required")
@@ -44,4 +48,5 @@ def generate(
 
     # Stable sort: ties keep generation order, so output stays deterministic.
     events.sort(key=lambda e: e.timestamp)
-    return events
+    # Last, so the RNG draws for generation are the same with or without degradation.
+    return degradation.apply(events, degrade, ctx)

@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from trazas import __version__, engine
+from trazas.degrade import FieldDegradation
 from trazas.scenarios import REGISTRY
 from trazas.writers import FORMATS, UnsupportedFormatError, write
 
@@ -27,6 +28,20 @@ def _non_negative_int(value: str) -> int:
     if n < 0:
         raise argparse.ArgumentTypeError("must be >= 0")
     return n
+
+
+def _drop_spec(value: str) -> FieldDegradation:
+    try:
+        return FieldDegradation.parse_drop(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+
+
+def _truncate_spec(value: str) -> FieldDegradation:
+    try:
+        return FieldDegradation.parse_truncate(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -53,6 +68,14 @@ def build_parser() -> argparse.ArgumentParser:
     gen.add_argument("--force", action="store_true", help="overwrite the output file if it exists")
     gen.add_argument("--labels", action="store_true",
                      help="add a _trazas ground-truth field to each JSON record")  # fmt: skip
+    gen.add_argument("--drop-field", type=_drop_spec, action="append", default=[], metavar="NAME:RATIO",
+                     help="remove field NAME from that share of the events carrying it, "
+                          "e.g. CallTrace:0.3 (repeatable)")  # fmt: skip
+    gen.add_argument("--truncate-field", type=_truncate_spec, action="append", default=[],
+                     metavar="NAME:LEN:RATIO",
+                     help="cut string field NAME to LEN characters in that share of the events "
+                          "where it is longer, e.g. CallTrace:60:0.5 "
+                          "(repeatable; applied after drops)")  # fmt: skip
     return parser
 
 
@@ -77,7 +100,12 @@ def _cmd_describe(scenario_id: str) -> int:
 def _cmd_generate(args: argparse.Namespace) -> int:
     seed: int = args.seed if args.seed is not None else secrets.randbits(63)
     start: datetime = args.start or datetime.now(timezone.utc).replace(microsecond=0)
-    events = engine.generate(args.scenarios, seed=seed, start=start, noise=args.noise)
+    degrade: list[FieldDegradation] = [*args.drop_field, *args.truncate_field]
+    if degrade and args.format == "raw":
+        # Raw lines are pre-rendered text; degrading fields would not change them.
+        print("error: --drop-field/--truncate-field need --format jsonl", file=sys.stderr)
+        return 2
+    events = engine.generate(args.scenarios, seed=seed, start=start, noise=args.noise, degrade=degrade)
 
     if args.format == "raw" and any(e.raw is None for e in events):
         print("error: --format raw only supports Linux scenarios; use jsonl", file=sys.stderr)
@@ -94,10 +122,10 @@ def _cmd_generate(args: argparse.Namespace) -> int:
             print(f"error: {args.output} exists (use --force to overwrite)", file=sys.stderr)
             return 1
 
-    print(
-        f"trazas: {count} events, seed={seed}, start={start.isoformat()}",
-        file=sys.stderr,
-    )
+    summary = f"trazas: {count} events, seed={seed}, start={start.isoformat()}"
+    if degrade:
+        summary += f", degraded={sum(1 for e in events if e.degraded)}"
+    print(summary, file=sys.stderr)
     return 0
 
 

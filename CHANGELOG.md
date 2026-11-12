@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `--drop-field NAME:RATIO` and `--truncate-field NAME:LEN:RATIO` to simulate incomplete
+  telemetry, reproducible from the seed. Only the named field changes; the rest of the
+  dataset is identical to an undegraded run. With `--labels`, affected events list the
+  degraded fields in `_trazas.degraded`. Without these options the output is unchanged.
+- Docs: "Example: incomplete telemetry" walkthrough (missing and truncated `CallTrace`,
+  a fail-closed rule, and a telemetry health query).
+
 ## [0.1.0] - 2026-11-11
 
 ### Added

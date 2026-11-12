@@ -60,6 +60,8 @@ and 7 give comsvcs, Mimikatz and procdump). Walkthrough in
   record.
 - **Realistic noise** — normal logons, admin share use, honest password typos, and
   security software touching `lsass.exe`.
+- **Telemetry gaps** — `--drop-field` / `--truncate-field` remove or cut fields in a share of
+  the events, so you can see what your rule does when the data is incomplete.
 - **Safe by design** — external IPs come only from RFC 5737 documentation ranges,
   internal ones from RFC 1918, domains from `example.com`. Zero runtime dependencies.
 
@@ -85,6 +87,8 @@ trazas generate SCENARIO [SCENARIO ...]
   -f, --format         jsonl (default) | raw  (raw = native text, Linux only)
   -o, --output PATH    write to file (refuses to overwrite without --force)
   --labels             add ground-truth labels
+  --drop-field NAME:RATIO          remove a field from that share of events (e.g. CallTrace:0.3)
+  --truncate-field NAME:LEN:RATIO  cut a string field to LEN characters in that share of events
 ```
 
 ## Testing a KQL rule without Sentinel

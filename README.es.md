@@ -52,6 +52,8 @@ semillas 1, 5 y 7 dan comsvcs, Mimikatz y procdump). Paso a paso en
 - **Verdad base**: `--labels` agrega `_trazas.malicious` y `_trazas.technique` a cada registro.
 - **Ruido realista**: inicios de sesión normales, uso de recursos compartidos, errores de
   contraseña honestos y software de seguridad accediendo a `lsass.exe`.
+- **Huecos de telemetría**: `--drop-field` / `--truncate-field` quitan o recortan campos en una
+  parte de los eventos, para ver qué hace tu regla cuando los datos llegan incompletos.
 - **Seguro por diseño**: las IP externas salen solo de rangos de documentación (RFC 5737),
   las internas de RFC 1918 y los dominios de `example.com`. Cero dependencias en tiempo de
   ejecución.
