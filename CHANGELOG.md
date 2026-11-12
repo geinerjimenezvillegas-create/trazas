@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-11
+
 ### Added
 
 - `--drop-field NAME:RATIO` and `--truncate-field NAME:LEN:RATIO` to simulate incomplete
@@ -14,6 +16,8 @@ All notable changes to this project are documented here. The format follows
   degraded fields in `_trazas.degraded`. Without these options the output is unchanged.
 - Docs: "Example: incomplete telemetry" walkthrough (missing and truncated `CallTrace`,
   a fail-closed rule, and a telemetry health query).
+- README: "Why look-alikes matter" demo (an access-mask-only LSASS rule gives 1 TP / 89 FP;
+  adding a CallTrace condition gives 1 TP / 0 FP), with a full walkthrough in the docs.
 
 ## [0.1.0] - 2026-11-11
 
@@ -30,5 +34,6 @@ All notable changes to this project are documented here. The format follows
 - `jsonl` output with Sentinel `SecurityEvent` column names and `raw` auth.log output.
 - Optional ground-truth labels (`--labels`).
 
-[Unreleased]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/geinerjimenezvillegas-create/trazas/releases/tag/v0.1.0
