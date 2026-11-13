@@ -57,7 +57,7 @@ and 7 give comsvcs, Mimikatz and procdump). Walkthrough in
 - **Reproducible** — same `--seed` + `--start` ⇒ byte-identical output. Perfect for
   regression tests of your rules in CI.
 - **Ground truth** — `--labels` adds `_trazas.malicious` and `_trazas.technique` to every
-  record.
+  record, or `--labels-file` keeps them in a separate file for blind testing.
 - **Realistic noise** — normal logons, admin share use, honest password typos, and
   security software touching `lsass.exe`.
 - **Telemetry gaps** — `--drop-field` / `--truncate-field` remove or cut fields in a share of
@@ -89,14 +89,23 @@ trazas generate SCENARIO [SCENARIO ...]
   --labels             add ground-truth labels
   --drop-field NAME:RATIO          remove a field from that share of events (e.g. CallTrace:0.3)
   --truncate-field NAME:LEN:RATIO  cut a string field to LEN characters in that share of events
+  --labels-file PATH   write ground truth to a separate file (blind testing, see below)
+
+trazas schema          print the KQL commands that create the tables (run before ingesting)
 ```
+
+Every JSON record has a `TrazasEventId` (1, 2, 3… in output order) that ties it to its
+ground truth.
 
 ## Testing a KQL rule without Sentinel
 
 1. Create a free [Azure Data Explorer cluster](https://dataexplorer.azure.com/freecluster).
-2. Generate data: `trazas generate windows-bruteforce windows-spray -s 1 --labels -o events.jsonl`
-3. Ingest `events.jsonl` into a table named `SecurityEvent` (JSON format).
-4. Run your rule. Example:
+2. Run `trazas schema` and execute the commands it prints in the ADX query editor, **before the
+   first ingestion**. This creates the tables with every column and the right types up front. Otherwise ADX guesses the columns from the
+   first rows and can leave out rarer ones such as Sysmon's `CallTrace`.
+3. Generate data: `trazas generate windows-bruteforce windows-spray -s 1 --labels -o events.jsonl`
+4. Ingest `events.jsonl` into the existing table `SecurityEvent` (JSON format).
+5. Run your rule. Example:
 
 ```kql
 SecurityEvent

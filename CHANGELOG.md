@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `trazas schema` prints `.create-merge table` commands for the events table and the labels
+  table, so they can be created in Azure Data Explorer before ingesting. This avoids columns
+  such as `CallTrace` being left out by schema inference. A test keeps the schema in sync
+  with what the generators emit.
+- `--labels-file PATH` writes ground truth to a separate JSONL file keyed by
+  `TrazasEventId`, for blind testing. It can be combined with `--labels`.
+
+### Changed
+
+- Every JSON record now has a `TrazasEventId` column (1, 2, 3… in output order). Other
+  fields and the event order are unchanged.
+
 ## [0.2.0] - 2026-11-11
 
 ### Added
