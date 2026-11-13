@@ -121,8 +121,11 @@ def _cmd_schema(table: str, labels_table: str) -> int:
     labels_cmd = kql_create_table(labels_table, LABEL_COLUMNS)
     print(f"{events_cmd}\n\n{labels_cmd}")
     print(
-        "trazas: run each command on its own (cursor inside it, then Shift+Enter) "
-        "before ingesting; the second is only needed with --labels-file.",
+        "trazas: run each command on its own (cursor inside it, then Shift+Enter) BEFORE the "
+        "first ingestion; the second is only needed with --labels-file. A table created "
+        "earlier by the ingestion wizard may have other column types (e.g. EventID as "
+        "string), which .create-merge cannot change: use a new name with --table, or drop "
+        "that table first.",
         file=sys.stderr,
     )
     return 0

@@ -72,8 +72,9 @@ semillas 1, 5 y 7 dan comsvcs, Mimikatz y procdump). Paso a paso en
 ## Probar una regla KQL sin Sentinel
 
 1. Creá un [clúster gratuito de Azure Data Explorer](https://dataexplorer.azure.com/freecluster).
-2. Corré `trazas schema` y ejecutá en el editor de consultas de ADX los comandos que imprime.
-   Así se crean las tablas con todas las columnas desde el principio. Si no, ADX deduce las
+2. Corré `trazas schema` y ejecutá en el editor de consultas de ADX los comandos que imprime,
+   **antes de la primera carga**. Así se crean las tablas con todas las columnas y los tipos
+   correctos desde el principio. Si no, ADX deduce las
    columnas de las primeras filas y puede dejar fuera algunas menos frecuentes, como `CallTrace`
    de Sysmon.
 3. Generá datos: `trazas generate windows-bruteforce windows-spray -s 1 --labels -o events.jsonl`

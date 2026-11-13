@@ -100,8 +100,8 @@ ground truth.
 ## Testing a KQL rule without Sentinel
 
 1. Create a free [Azure Data Explorer cluster](https://dataexplorer.azure.com/freecluster).
-2. Run `trazas schema` and execute the commands it prints in the ADX query editor. This
-   creates the tables with every column up front. Otherwise ADX guesses the columns from the
+2. Run `trazas schema` and execute the commands it prints in the ADX query editor, **before the
+   first ingestion**. This creates the tables with every column and the right types up front. Otherwise ADX guesses the columns from the
    first rows and can leave out rarer ones such as Sysmon's `CallTrace`.
 3. Generate data: `trazas generate windows-bruteforce windows-spray -s 1 --labels -o events.jsonl`
 4. Ingest `events.jsonl` into the existing table `SecurityEvent` (JSON format).

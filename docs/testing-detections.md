@@ -14,13 +14,20 @@ Pin `--seed` and `--start` so the same dataset can be regenerated in CI.
 
 ## 2. Load it into Azure Data Explorer (free, KQL)
 
-**Create the tables first.** Run `trazas schema`, then paste its output into the ADX query
-editor and run each command on its own (put the cursor inside it and press Shift+Enter).
-The commands use `.create-merge`, so running them again is harmless.
+**Create the tables before the first ingestion.** Run `trazas schema`, then paste its output
+into the ADX query editor and run each command on its own (put the cursor inside it and press
+Shift+Enter). Open the editor directly at `dataexplorer.azure.com`: a tab opened from a link,
+such as the wizard's *Explore* button, is read-only and rejects these commands. The commands
+use `.create-merge`, so running them again is harmless.
 
-Why: if you let the ingestion wizard create the table, ADX infers columns from the first
-rows of the file. Columns that only appear in rarer events (Sysmon's `CallTrace`, for
-example) can be left out, and rules then fail with *"Failed to resolve ... 'CallTrace'"*.
+Why: if you let the ingestion wizard create the table, it guesses each column from the first
+rows of the file. Rarer columns (Sysmon's `CallTrace`) can be left out, and types can come
+out wrong; in testing, the wizard created `EventID` as `string`.
+
+**Already created the table with the wizard?** `.create-merge` adds missing columns but cannot
+change an existing column's type, and fails with *"Alter table does not support column data
+type change"*. Either use another table name (`trazas schema --table Lab`), or drop the old
+table (`.drop table SecurityEvent`), run the command again and re-ingest.
 
 Then in the ADX web UI: **Get data → Local file → events.jsonl**, choose the **existing**
 table `SecurityEvent`, format JSON.
