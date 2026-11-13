@@ -6,12 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-12
+
 ### Added
 
 - `trazas schema` prints `.create-merge table` commands for the events table and the labels
-  table, so they can be created in Azure Data Explorer before ingesting. This avoids columns
-  such as `CallTrace` being left out by schema inference. A test keeps the schema in sync
-  with what the generators emit.
+  table, so they can be created in Azure Data Explorer before the first ingestion. The
+  ingestion wizard's schema inference can leave out rarer columns such as `CallTrace` and
+  guess wrong types (it created `EventID` as `string` in testing). A test keeps the schema in
+  sync with what the generators emit.
 - `--labels-file PATH` writes ground truth to a separate JSONL file keyed by
   `TrazasEventId`, for blind testing. It can be combined with `--labels`.
 
@@ -48,6 +51,7 @@ All notable changes to this project are documented here. The format follows
 - `jsonl` output with Sentinel `SecurityEvent` column names and `raw` auth.log output.
 - Optional ground-truth labels (`--labels`).
 
-[Unreleased]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/geinerjimenezvillegas-create/trazas/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/geinerjimenezvillegas-create/trazas/releases/tag/v0.1.0
